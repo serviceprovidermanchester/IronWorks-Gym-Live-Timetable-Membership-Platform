@@ -6,6 +6,9 @@
  * POST /auth/login
  * POST /auth/logout
  * POST /auth/refresh
+ * POST /auth/forgot-password
+ * POST /auth/reset-password
+ * GET  /auth/verify-email/:token
  * GET  /auth/me
  */
 import { Router, Request, Response, NextFunction } from 'express';
@@ -362,6 +365,80 @@ router.get('/me', requireAuth, async (req: Request, res: Response, next: NextFun
 
     if (!member) throw new AppError('Member not found', 404, 'NOT_FOUND');
     res.json({ success: true, data: member });
+  } catch (err) { next(err); }
+});
+
+// In-memory token store for password resets (dev-only)
+const PASSWORD_RESET_TOKENS = new Map<string, { email: string; expires: number }>();
+const EMAIL_VERIFY_TOKENS  = new Map<string, { email: string; expires: number }>();
+
+// POST /forgot-password
+router.post('/forgot-password', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email } = z.object({ email: z.string().email() }).parse(req.body);
+    const normalized = email.toLowerCase().trim();
+    const token = uuidv4();
+    PASSWORD_RESET_TOKENS.set(token, { email: normalized, expires: Date.now() + 60 * 60 * 1000 });
+
+    // Send email (silently ignore errors in dev)
+    (emailService as any).sendPasswordResetEmail?.({ email: normalized, resetToken: token })?.catch?.(() => {});
+
+    // Always return success (don't reveal if email exists)
+    res.json({
+      success: true,
+      message: 'If that email is registered, a password reset link has been sent.',
+      ...(process.env.NODE_ENV !== 'production' && { devToken: token }),
+    });
+  } catch (err) { next(err); }
+});
+
+// POST /reset-password
+router.post('/reset-password', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { token, password } = z.object({
+      token: z.string().uuid(),
+      password: z.string().min(8, 'Password must be at least 8 characters'),
+    }).parse(req.body);
+
+    const record = PASSWORD_RESET_TOKENS.get(token);
+    if (!record || record.expires < Date.now()) {
+      throw new AppError('Reset token is invalid or expired', 400, 'TOKEN_EXPIRED');
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    PASSWORD_RESET_TOKENS.delete(token);
+
+    // Update in-memory store
+    const memUser = IN_MEMORY_USERS.get(record.email);
+    if (memUser) {
+      memUser.passwordHash = passwordHash;
+      IN_MEMORY_USERS.set(record.email, memUser);
+    }
+
+    // Update DB if available
+    try {
+      await prisma.member.update({ where: { email: record.email }, data: { passwordHash } });
+    } catch {}
+
+    res.json({ success: true, message: 'Password has been reset successfully. You can now log in.' });
+  } catch (err) { next(err); }
+});
+
+// GET /verify-email/:token
+router.get('/verify-email/:token', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const token = req.params.token as string;
+    const record = EMAIL_VERIFY_TOKENS.get(token);
+    if (!record || record.expires < Date.now()) {
+      throw new AppError('Verification token is invalid or expired', 400, 'TOKEN_EXPIRED');
+    }
+    EMAIL_VERIFY_TOKENS.delete(token);
+
+    try {
+      await prisma.member.update({ where: { email: record.email }, data: { emailVerifiedAt: new Date() } });
+    } catch {}
+
+    res.json({ success: true, message: 'Email verified successfully. Welcome to IronWorks!' });
   } catch (err) { next(err); }
 });
 

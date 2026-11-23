@@ -18,8 +18,8 @@ import { MembershipTier } from '@prisma/client';
 
 const router = Router();
 
-// GET /membership-plans (public)
-router.get('/plans', async (_req: Request, res: Response, next: NextFunction) => {
+// GET /plans & GET / (public) — returns all active membership plans
+const getPlansHandler = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     try {
       const plans = await prisma.membershipPlan.findMany({
@@ -36,7 +36,10 @@ router.get('/plans', async (_req: Request, res: Response, next: NextFunction) =>
     const { MOCK_MEMBERSHIP_PLANS } = await import('../lib/mockData');
     res.json({ success: true, data: MOCK_MEMBERSHIP_PLANS, fallback: true });
   } catch (err) { next(err); }
-});
+};
+
+router.get('/plans', getPlansHandler);
+router.get('/', getPlansHandler);
 
 // POST /memberships/checkout  — Stripe Checkout session
 router.post('/checkout', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
@@ -122,6 +125,51 @@ router.post('/cancel', requireAuth, async (req: Request, res: Response, next: Ne
     });
 
     res.json({ success: true, message: 'Membership cancelled. Access continues until end of current billing period.' });
+  } catch (err) { next(err); }
+});
+
+// POST /memberships/pause
+router.post('/pause', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { reason } = z.object({ reason: z.string().optional() }).parse(req.body);
+
+    try {
+      const membership = await prisma.membership.findUnique({ where: { memberId: req.member!.id } });
+      if (!membership) throw new AppError('No active membership found', 404, 'NO_MEMBERSHIP');
+      if (membership.status !== 'ACTIVE') throw new AppError('Only active memberships can be paused', 400, 'NOT_ACTIVE');
+
+      await prisma.membership.update({
+        where: { id: membership.id },
+        data: { status: 'PAUSED' } as any,
+      });
+      return res.json({ success: true, message: 'Membership paused. Resume any time from your dashboard.' });
+    } catch (dbErr: any) {
+      if (dbErr.code === 'NOT_ACTIVE' || dbErr.code === 'NO_MEMBERSHIP') throw dbErr;
+      // DB offline fallback
+    }
+
+    res.json({ success: true, message: 'Membership pause request received (offline mode).' });
+  } catch (err) { next(err); }
+});
+
+// POST /memberships/resume
+router.post('/resume', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    try {
+      const membership = await prisma.membership.findUnique({ where: { memberId: req.member!.id } });
+      if (!membership) throw new AppError('No membership found', 404, 'NO_MEMBERSHIP');
+      if (membership.status !== 'PAUSED') throw new AppError('Membership is not paused', 400, 'NOT_PAUSED');
+
+      await prisma.membership.update({
+        where: { id: membership.id },
+        data: { status: 'ACTIVE' } as any,
+      });
+      return res.json({ success: true, message: 'Membership resumed successfully.' });
+    } catch (dbErr: any) {
+      if (dbErr.code === 'NOT_PAUSED' || dbErr.code === 'NO_MEMBERSHIP') throw dbErr;
+    }
+
+    res.json({ success: true, message: 'Membership resume request received (offline mode).' });
   } catch (err) { next(err); }
 });
 

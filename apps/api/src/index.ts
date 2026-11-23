@@ -23,6 +23,7 @@ import authRoutes from './routes/auth';
 import classRoutes from './routes/classes';
 import coachRoutes from './routes/coaches';
 import membershipRoutes from './routes/memberships';
+import memberRoutes from './routes/members';
 import bookingRoutes from './routes/bookings';
 import adminRoutes from './routes/admin';
 import webhookRoutes from './routes/webhooks';
@@ -72,7 +73,7 @@ app.use(pinoHttp({ logger, autoLogging: { ignore: (req) => req.url === '/health'
 app.use(globalRateLimiter);
 
 // ── Health check ──────────────────────────────────────────────
-app.get('/health', (_req, res) => {
+const healthHandler = (_req: express.Request, res: express.Response) => {
   res.json({
     status: 'ok',
     service: 'ironworks-api',
@@ -80,13 +81,17 @@ app.get('/health', (_req, res) => {
     timestamp: new Date().toISOString(),
     built_by: 'SPManchester Private Limited',
   });
-});
+};
+app.get('/health', healthHandler);
+app.get('/v1/health', healthHandler);
 
 // ── API v1 routes ─────────────────────────────────────────────
 app.use('/v1/auth', authRoutes);
 app.use('/v1/classes', classRoutes);
 app.use('/v1/coaches', coachRoutes);
 app.use('/v1/memberships', membershipRoutes);
+app.use('/v1/membership-plans', membershipRoutes);
+app.use('/v1/members', memberRoutes);
 app.use('/v1/bookings', bookingRoutes);
 app.use('/v1/admin', adminRoutes);
 app.use('/v1/webhooks', webhookRoutes);
