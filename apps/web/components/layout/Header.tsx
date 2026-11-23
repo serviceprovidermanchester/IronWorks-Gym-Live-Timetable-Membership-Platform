@@ -58,7 +58,7 @@ export function Header() {
           {PUBLIC_LINKS.map((l) => (
             <Link
               key={l.href}
-              href={l.href}
+              href={l.href as any}
               className="font-semibold text-slate-300 hover:text-white transition-colors text-sm no-underline"
             >
               {l.label}
@@ -166,7 +166,7 @@ export function Header() {
           {PUBLIC_LINKS.map((l) => (
             <Link
               key={l.href}
-              href={l.href}
+              href={l.href as any}
               className="font-semibold text-slate-200 hover:text-brand py-2 border-b border-slate-800/60 no-underline text-base transition-colors"
               onClick={() => setMobileOpen(false)}
             >

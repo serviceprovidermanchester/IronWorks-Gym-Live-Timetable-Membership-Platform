@@ -20,7 +20,7 @@ export function Footer() {
             <h3 className="text-white font-bold text-xs uppercase tracking-widest mb-2">Quick Links</h3>
             {['/#timetable|Timetable', '/membership|Membership', '/#coaches|Coaches', '/login|Member login'].map((item) => {
               const [href, label] = item.split('|');
-              return <Link key={href} href={href} className="text-sm text-gray-400 hover:text-white transition-colors no-underline">{label}</Link>;
+              return <Link key={href} href={href as any} className="text-sm text-gray-400 hover:text-white transition-colors no-underline">{label}</Link>;
             })}
           </nav>
           {/* SPManchester */}

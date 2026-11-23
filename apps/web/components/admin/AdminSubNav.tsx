@@ -7,7 +7,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import { LayoutDashboard, Dumbbell, Users, CreditCard, LogOut, UserCheck, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, Users, CreditCard, LogOut, UserCheck, ExternalLink, CalendarCheck } from 'lucide-react';
 
 export function AdminSubNav({ title, subtitle }: { title?: string; subtitle?: string }) {
   const pathname = usePathname();
@@ -16,6 +16,7 @@ export function AdminSubNav({ title, subtitle }: { title?: string; subtitle?: st
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/classes', label: 'Class Timetable', icon: Dumbbell },
     { href: '/admin/members', label: 'Members Directory', icon: Users },
+    { href: '/admin/bookings', label: 'Bookings & Check-In', icon: CalendarCheck },
     { href: '/admin/payments', label: 'Revenue & Payments', icon: CreditCard },
   ];
 
@@ -75,7 +76,7 @@ export function AdminSubNav({ title, subtitle }: { title?: string; subtitle?: st
           return (
             <Link
               key={tab.href}
-              href={tab.href}
+              href={tab.href as any}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap no-underline ${
                 active
                   ? 'bg-slate-900 text-amber-400 border border-amber-500/40 shadow-sm'

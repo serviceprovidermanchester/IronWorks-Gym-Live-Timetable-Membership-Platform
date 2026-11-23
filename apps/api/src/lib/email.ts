@@ -6,57 +6,146 @@
 
 import { Resend } from 'resend';
 import { logger } from './logger';
+import {
+  renderWelcomeEmail,
+  renderEmailVerification,
+  renderMembershipConfirmation,
+  renderPaymentReceipt,
+  renderPaymentFailed,
+  renderBookingConfirmation,
+  renderBookingReminder,
+  renderBookingCancelled,
+  renderPasswordReset,
+  renderMembershipRenewal,
+  renderMembershipCancellation,
+} from '../emails';
 
 const resendApiKey = process.env.RESEND_API_KEY || 're_placeholder_dev_key';
 export const resend = new Resend(resendApiKey);
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'IronWorks Gym <notifications@ironworksgym.co.uk>';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+async function sendOrLog({
+  to,
+  subject,
+  html,
+  tag,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+  tag: string;
+}) {
+  try {
+    if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
+      logger.info({ to, subject, tag }, `[DEV EMAIL] ${tag} triggered (offline mock)`);
+      return { success: true, id: `mock-${tag}-${Date.now()}` };
+    }
+    return await resend.emails.send({
+      from: FROM_EMAIL,
+      to,
+      subject,
+      html,
+    });
+  } catch (error) {
+    logger.error({ error, to, tag }, `Failed to send email: ${tag}`);
+    return { success: false, error };
+  }
+}
 
 export const emailService = {
-  async sendWelcomeEmail({
+  // 1. Welcome Email (Register)
+  async sendWelcomeEmail({ email, name, memberRef }: { email: string; name: string; memberRef: string }) {
+    const html = renderWelcomeEmail({
+      name,
+      memberRef,
+      verifyUrl: `${FRONTEND_URL}/verify-email?ref=${memberRef}`,
+    });
+    return sendOrLog({ to: email, subject: 'Welcome to IronWorks Gym Manchester', html, tag: 'welcome' });
+  },
+
+  // 2. Email Verification (Register)
+  async sendEmailVerification({ email, name, token }: { email: string; name: string; token: string }) {
+    const html = renderEmailVerification({
+      name,
+      verifyUrl: `${FRONTEND_URL}/verify-email?token=${token}`,
+      expiresInHours: 24,
+    });
+    return sendOrLog({ to: email, subject: 'Verify Your Email — IronWorks Gym', html, tag: 'email-verification' });
+  },
+
+  // 3. Membership Confirmation (Payment success)
+  async sendMembershipConfirmation({
     email,
     name,
+    planName,
     memberRef,
+    startDate,
+    amount,
   }: {
     email: string;
     name: string;
+    planName: string;
     memberRef: string;
+    startDate: string;
+    amount: string;
   }) {
-    try {
-      if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
-        logger.info({ email, memberRef }, '[DEV EMAIL] Welcome email triggered (mock)');
-        return { success: true, id: 'mock-email-id' };
-      }
-
-      return await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: 'Welcome to IronWorks Gym Manchester — Membership Confirmed',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; border: 1px solid #334155;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #f97316; font-size: 28px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">IronWorks Gym</h1>
-              <p style="color: #94a3b8; font-size: 14px; margin-top: 4px;">Ancoats, Manchester · Strength & Conditioning</p>
-            </div>
-            <div style="background: #1e293b; padding: 24px; border-radius: 8px; margin-bottom: 24px; border-left: 4px solid #f97316;">
-              <h2 style="color: #ffffff; font-size: 20px; margin-top: 0;">Welcome to the family, ${name}!</h2>
-              <p style="color: #cbd5e1; line-height: 1.6;">Your membership has been activated. You now have full access to our timetable, facilities, and coaching team.</p>
-              <div style="margin-top: 16px; padding: 12px; background: #0f172a; border-radius: 6px; display: inline-block;">
-                <span style="color: #94a3b8; font-size: 12px; text-transform: uppercase; display: block;">Your Member Reference</span>
-                <span style="color: #f97316; font-family: monospace; font-size: 20px; font-weight: bold;">${memberRef}</span>
-              </div>
-            </div>
-            <p style="color: #94a3b8; font-size: 13px; line-height: 1.5;">You can book classes up to 7 days in advance via your member portal.</p>
-            <hr style="border: 0; border-top: 1px solid #334155; margin: 24px 0;" />
-            <p style="color: #64748b; font-size: 11px; text-align: center;">Built with pride by SPManchester Private Limited · <a href="https://www.spmanchester.com" style="color: #f97316; text-decoration: none;">www.spmanchester.com</a></p>
-          </div>
-        `,
-      });
-    } catch (error) {
-      logger.error({ error, email }, 'Failed to send welcome email');
-    }
+    const html = renderMembershipConfirmation({
+      name,
+      planName,
+      memberRef,
+      startDate,
+      amount,
+      portalUrl: `${FRONTEND_URL}/dashboard`,
+    });
+    return sendOrLog({ to: email, subject: `Membership Confirmed: ${planName} — IronWorks Gym`, html, tag: 'membership-confirmation' });
   },
 
+  // 4. Payment Receipt (Payment collected)
+  async sendPaymentReceipt({
+    email,
+    name,
+    amount,
+    date,
+    invoiceId,
+    planName,
+    downloadUrl,
+  }: {
+    email: string;
+    name: string;
+    amount: string;
+    date: string;
+    invoiceId: string;
+    planName?: string;
+    downloadUrl?: string;
+  }) {
+    const html = renderPaymentReceipt({ name, amount, date, invoiceId, planName, downloadUrl });
+    return sendOrLog({ to: email, subject: `Payment Receipt: ${amount} — IronWorks Gym (${invoiceId})`, html, tag: 'payment-receipt' });
+  },
+
+  // 5. Payment Failed (Stripe/GC failure)
+  async sendPaymentFailed({
+    email,
+    name,
+    amount,
+    reason,
+  }: {
+    email: string;
+    name: string;
+    amount: string;
+    reason?: string;
+  }) {
+    const html = renderPaymentFailed({
+      name,
+      amount,
+      reason,
+      updatePaymentUrl: `${FRONTEND_URL}/billing`,
+    });
+    return sendOrLog({ to: email, subject: 'Payment Failed: Action Required — IronWorks Gym', html, tag: 'payment-failed' });
+  },
+
+  // 6. Booking Confirmation (Booking created)
   async sendBookingConfirmation({
     email,
     name,
@@ -74,35 +163,130 @@ export const emailService = {
     time: string;
     coach: string;
   }) {
-    try {
-      if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
-        logger.info({ email, bookingRef, className }, '[DEV EMAIL] Booking confirmation sent (mock)');
-        return { success: true, id: 'mock-booking-id' };
-      }
-
-      return await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: `Class Confirmed: ${className} on ${date}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; border: 1px solid #334155;">
-            <h2 style="color: #f97316; margin-top: 0;">Reservation Confirmed ✓</h2>
-            <p style="color: #cbd5e1;">Hi ${name}, your spot in <strong>${className}</strong> is secured.</p>
-            <div style="background: #1e293b; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Booking Ref:</strong> <span style="font-family: monospace; color: #f97316;">${bookingRef}</span></p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Date:</strong> ${date}</p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Time:</strong> ${time}</p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Coach:</strong> ${coach}</p>
-            </div>
-            <p style="color: #94a3b8; font-size: 13px;">Please arrive 10 minutes prior to warm up. Need to cancel? Give at least 2 hours notice to free up the slot.</p>
-          </div>
-        `,
-      });
-    } catch (error) {
-      logger.error({ error, email }, 'Failed to send booking confirmation email');
-    }
+    const html = renderBookingConfirmation({
+      name,
+      className,
+      date,
+      time,
+      coach,
+      bookingRef,
+      cancelUrl: `${FRONTEND_URL}/bookings`,
+    });
+    return sendOrLog({ to: email, subject: `Class Confirmed: ${className} on ${date}`, html, tag: 'booking-confirmation' });
   },
 
+  // 7. Booking Reminder (2h before class)
+  async sendBookingReminder({
+    email,
+    name,
+    className,
+    time,
+    coach,
+  }: {
+    email: string;
+    name: string;
+    className: string;
+    time: string;
+    coach: string;
+  }) {
+    const html = renderBookingReminder({ name, className, time, coach });
+    return sendOrLog({ to: email, subject: `Reminder: ${className} starts in 2 hours`, html, tag: 'booking-reminder' });
+  },
+
+  // 8. Booking Cancelled (Cancellation)
+  async sendBookingCancelled({
+    email,
+    name,
+    className,
+    date,
+    time,
+    bookingRef,
+  }: {
+    email: string;
+    name: string;
+    className: string;
+    date: string;
+    time: string;
+    bookingRef: string;
+  }) {
+    const html = renderBookingCancelled({
+      name,
+      className,
+      date,
+      time,
+      bookingRef,
+      rebookUrl: `${FRONTEND_URL}/timetable`,
+    });
+    return sendOrLog({ to: email, subject: `Booking Cancelled: ${className} on ${date}`, html, tag: 'booking-cancelled' });
+  },
+
+  // 9. Password Reset (Forgot password)
+  async sendPasswordResetEmail({
+    email,
+    resetToken,
+    name,
+  }: {
+    email: string;
+    resetToken: string;
+    name?: string;
+  }) {
+    const html = renderPasswordReset({
+      name,
+      resetUrl: `${FRONTEND_URL}/reset-password?token=${resetToken}`,
+      expiresInMinutes: 60,
+    });
+    return sendOrLog({ to: email, subject: 'Reset Your Password — IronWorks Gym', html, tag: 'password-reset' });
+  },
+
+  // 10. Membership Renewal (3 days before renewal)
+  async sendMembershipRenewalNotice({
+    email,
+    name,
+    planName,
+    amount,
+    renewalDate,
+  }: {
+    email: string;
+    name: string;
+    planName: string;
+    amount: string;
+    renewalDate: string;
+  }) {
+    const html = renderMembershipRenewal({
+      name,
+      planName,
+      amount,
+      renewalDate,
+      manageUrl: `${FRONTEND_URL}/billing`,
+    });
+    return sendOrLog({ to: email, subject: `Upcoming Membership Renewal — ${planName}`, html, tag: 'membership-renewal' });
+  },
+
+  // 11. Membership Cancellation (Cancel confirmed)
+  async sendMembershipCancellationNotice({
+    email,
+    name,
+    planName,
+    accessEndDate,
+    coolingOffApplied,
+  }: {
+    email: string;
+    name: string;
+    planName: string;
+    accessEndDate: string;
+    coolingOffApplied?: boolean;
+  }) {
+    const html = renderMembershipCancellation({
+      name,
+      planName,
+      accessEndDate,
+      coolingOffApplied,
+      rejoinUrl: `${FRONTEND_URL}/membership`,
+    });
+    return sendOrLog({ to: email, subject: 'Membership Cancellation Confirmed — IronWorks Gym', html, tag: 'membership-cancellation' });
+  },
+
+  // Waitlist Promotion
   async sendWaitlistPromotion({
     email,
     name,
@@ -116,68 +300,11 @@ export const emailService = {
     date: string;
     time: string;
   }) {
-    try {
-      if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
-        logger.info({ email, className }, '[DEV EMAIL] Waitlist promotion sent (mock)');
-        return { success: true, id: 'mock-waitlist-id' };
-      }
-
-      return await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: `Spot Available! You've been promoted into ${className}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; border: 1px solid #334155;">
-            <h2 style="color: #10b981; margin-top: 0;">You're In! Spot Confirmed 🎉</h2>
-            <p style="color: #cbd5e1;">Hi ${name}, a spot has opened up for <strong>${className}</strong> on ${date} at ${time}.</p>
-            <p style="color: #cbd5e1;">Because you were next on the waitlist, your reservation has automatically been upgraded to <strong>CONFIRMED</strong>.</p>
-          </div>
-        `,
-      });
-    } catch (error) {
-      logger.error({ error, email }, 'Failed to send waitlist promotion email');
-    }
-  },
-
-  async sendPaymentReceipt({
-    email,
-    name,
-    amount,
-    date,
-    invoiceId,
-  }: {
-    email: string;
-    name: string;
-    amount: string;
-    date: string;
-    invoiceId: string;
-  }) {
-    try {
-      if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
-        logger.info({ email, amount, invoiceId }, '[DEV EMAIL] Payment receipt sent (mock)');
-        return { success: true, id: 'mock-receipt-id' };
-      }
-
-      return await resend.emails.send({
-        from: FROM_EMAIL,
-        to: email,
-        subject: `Payment Receipt: ${amount} — IronWorks Gym (${invoiceId})`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; border: 1px solid #334155;">
-            <h2 style="color: #f97316; margin-top: 0;">Payment Receipt</h2>
-            <p style="color: #cbd5e1;">Hi ${name}, thank you for your monthly membership payment.</p>
-            <div style="background: #1e293b; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Invoice #:</strong> <span style="font-family: monospace; color: #f97316;">${invoiceId}</span></p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Date:</strong> ${date}</p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Amount Paid:</strong> <span style="font-size: 18px; font-weight: bold; color: #10b981;">${amount}</span></p>
-              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Status:</strong> Paid in full</p>
-            </div>
-            <p style="color: #94a3b8; font-size: 12px;">This is your official receipt for tax or company wellness reimbursement.</p>
-          </div>
-        `,
-      });
-    } catch (error) {
-      logger.error({ error, email }, 'Failed to send receipt email');
-    }
+    return sendOrLog({
+      to: email,
+      subject: `Spot Available! Promoted into ${className}`,
+      html: `<div style="font-family: sans-serif; background:#0f172a; color:#fff; padding:24px; border-radius:12px;"><h2>Spot Confirmed for ${className} on ${date} at ${time}!</h2><p>Hi ${name}, you were promoted from the waitlist into a confirmed spot.</p></div>`,
+      tag: 'waitlist-promotion',
+    });
   },
 };

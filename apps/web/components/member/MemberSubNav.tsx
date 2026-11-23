@@ -81,7 +81,7 @@ export function MemberSubNav({ title, subtitle }: { title?: string; subtitle?: s
           return (
             <Link
               key={tab.href}
-              href={tab.href}
+              href={tab.href as any}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap no-underline ${
                 active
                   ? 'bg-slate-900 text-brand border border-brand/40 shadow-sm'

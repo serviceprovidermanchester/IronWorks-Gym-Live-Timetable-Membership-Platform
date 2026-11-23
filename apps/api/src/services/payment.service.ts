@@ -86,7 +86,19 @@ export const paymentService = {
       amount: `£${(amountPence / 100).toFixed(2)}`,
       date: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
       invoiceId,
+      planName: plan?.name || String(tier),
     }).catch((err) => logger.error({ err }, 'Failed to send receipt email'));
+
+    // Send membership-confirmation email (Resend)
+    const memberRef = `IW-2026-M${member.id.slice(-4).toUpperCase()}`;
+    emailService.sendMembershipConfirmation({
+      email: member.email,
+      name: `${member.firstName} ${member.lastName}`,
+      planName: plan?.name || String(tier),
+      memberRef,
+      startDate: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+      amount: `£${(amountPence / 100).toFixed(2)}`,
+    }).catch((err) => logger.error({ err }, 'Failed to send membership confirmation email'));
 
     logger.info({ memberId, tier, provider }, 'Subscription and payment activated successfully');
   },
@@ -135,6 +147,14 @@ export const paymentService = {
         description: `Failed recurring payment via ${provider.toUpperCase()}`,
       },
     });
+
+    // Send payment-failed email
+    emailService.sendPaymentFailed({
+      email: membership.member.email,
+      name: `${membership.member.firstName} ${membership.member.lastName}`,
+      amount: `£${(membership.priceGbpPence / 100).toFixed(2)}`,
+      reason,
+    }).catch((err) => logger.error({ err }, 'Failed to send payment failed email'));
 
     logger.warn({ memberId: membership.memberId, reason }, 'Membership marked PAST_DUE due to failed payment');
   },
