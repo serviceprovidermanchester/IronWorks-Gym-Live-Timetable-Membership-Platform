@@ -5,8 +5,8 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "dev": "payload dev",
-    "build": "payload build",
+    "dev": "tsx src/server.ts",
+    "build": "tsc --outDir dist --module commonjs --target es2020 --esModuleInterop --skipLibCheck src/server.ts",
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
     "seed": "tsx src/seed.ts",
