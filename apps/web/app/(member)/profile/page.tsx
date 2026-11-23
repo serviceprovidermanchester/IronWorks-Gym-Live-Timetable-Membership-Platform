@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { MemberSubNav } from '@/components/member/MemberSubNav';
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState({
@@ -25,14 +26,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Member Profile</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Keep your personal contact and emergency health information up to date.
-          </p>
-        </div>
+        <MemberSubNav
+          title="Member Profile"
+          subtitle="Keep your contact, emergency details, and attendance preferences up to date."
+        />
 
         {saved && (
           <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-sm font-semibold">

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 interface ClassItem {
   id: string;
@@ -61,21 +62,19 @@ export default function AdminClassesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2">
-              <Link href="/admin" className="text-xs text-accent hover:underline font-bold uppercase">&larr; Admin Dashboard</Link>
-            </div>
-            <h1 className="text-3xl font-extrabold text-white mt-1">Class Schedule & Timetable Management</h1>
-            <p className="text-slate-400 text-sm">Add, configure, or adjust capacities for all weekly sessions.</p>
-          </div>
+        <AdminSubNav
+          title="Class Timetable Management"
+          subtitle="Configure weekly sessions, manage capacities, and adjust live coach assignments."
+        />
+
+        <div className="flex justify-end mb-6">
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 bg-accent hover:bg-accent-light text-slate-950 font-bold rounded-xl text-sm transition-all shadow-lg shadow-accent/10"
+            className="px-5 py-2.5 bg-brand hover:bg-orange-600 text-white font-bold rounded-xl text-xs transition-all shadow-md shadow-brand/20 flex items-center gap-2"
           >
-            + Add New Class
+            <span>+ Add New Class</span>
           </button>
         </div>
 

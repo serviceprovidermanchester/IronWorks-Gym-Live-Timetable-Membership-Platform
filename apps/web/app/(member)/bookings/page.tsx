@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { MemberSubNav } from '@/components/member/MemberSubNav';
 
 interface MockBooking {
   id: string;
@@ -77,22 +78,12 @@ export default function BookingsPage() {
   const displayed = activeTab === 'UPCOMING' ? upcoming : history;
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl font-extrabold text-white">My Class Bookings</h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Manage your reserved spots, check waitlist status, or schedule new training sessions.
-            </p>
-          </div>
-          <Link
-            href="/timetable"
-            className="inline-flex items-center justify-center px-5 py-2.5 bg-accent hover:bg-accent-light text-slate-950 font-bold rounded-xl transition-all text-sm shadow-lg shadow-accent/10"
-          >
-            + Book a Class
-          </Link>
-        </div>
+        <MemberSubNav
+          title="My Class Bookings"
+          subtitle="Manage your reserved spots, check waitlist positions, or schedule new sessions."
+        />
 
         {/* Tab navigation */}
         <div className="flex gap-2 border-b border-slate-800 pb-3 mb-6">

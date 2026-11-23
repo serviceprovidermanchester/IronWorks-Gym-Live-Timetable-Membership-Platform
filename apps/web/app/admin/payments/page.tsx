@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 interface Transaction {
   id: string;
@@ -31,29 +32,25 @@ export default function AdminPaymentsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2">
-              <Link href="/admin" className="text-xs text-accent hover:underline font-bold uppercase">&larr; Admin Dashboard</Link>
-            </div>
-            <h1 className="text-3xl font-extrabold text-white mt-1">Payments & Settlement Ledger</h1>
-            <p className="text-slate-400 text-sm">Real-time payment logs across Stripe card billing and GoCardless Direct Debit.</p>
-          </div>
-          <div className="flex gap-2">
-            {['ALL', 'Stripe', 'GoCardless'].map((p) => (
-              <button
-                key={p}
-                onClick={() => setProviderFilter(p)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
-                  providerFilter === p ? 'bg-accent text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
+        <AdminSubNav
+          title="Payments &amp; Settlement Ledger"
+          subtitle="Real-time payment logs across Stripe card billing and GoCardless Direct Debit."
+        />
+
+        <div className="flex gap-2 mb-6">
+          {['ALL', 'Stripe', 'GoCardless'].map((p) => (
+            <button
+              key={p}
+              onClick={() => setProviderFilter(p)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                providerFilter === p ? 'bg-accent text-slate-950' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+              }`}
+            >
+              {p}
+            </button>
+          ))}
         </div>
 
         {/* Ledger Table */}

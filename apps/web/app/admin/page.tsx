@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 export default function AdminDashboardPage() {
   const stats = [
@@ -32,33 +33,12 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-              <span className="text-xs uppercase font-bold text-accent tracking-wider">Gym Operations Control</span>
-            </div>
-            <h1 className="text-3xl font-extrabold text-white mt-1">Admin Dashboard</h1>
-          </div>
-          <div className="flex gap-3">
-            <a
-              href="http://localhost:3001/admin"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-sm border border-slate-700 transition-all flex items-center gap-2"
-            >
-              Payload CMS ↗
-            </a>
-            <button
-              onClick={() => alert('Exporting active members list to CSV...')}
-              className="px-4 py-2 bg-accent hover:bg-accent-light text-slate-950 font-bold rounded-xl text-sm transition-all"
-            >
-              Export CSV
-            </button>
-          </div>
-        </div>
+        <AdminSubNav
+          title="Admin Operations Dashboard"
+          subtitle="Real-time occupancy, revenue overview, and live class check-ins."
+        />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

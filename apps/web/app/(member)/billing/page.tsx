@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { MemberSubNav } from '@/components/member/MemberSubNav';
 
 export default function BillingPage() {
   const currentPlan = {
@@ -22,14 +23,12 @@ export default function BillingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Membership & Billing</h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Manage your subscription tier, payment methods, and billing receipts.
-          </p>
-        </div>
+        <MemberSubNav
+          title="Membership &amp; Billing"
+          subtitle="Manage your subscription tier, payment cards, and VAT invoices."
+        />
 
         {/* Current Plan Card */}
         <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 md:p-8 mb-8">

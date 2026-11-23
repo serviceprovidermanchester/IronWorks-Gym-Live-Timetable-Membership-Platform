@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { AdminSubNav } from '@/components/admin/AdminSubNav';
 
 interface AdminMember {
   id: string;
@@ -36,25 +37,12 @@ export default function AdminMembersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2">
-              <Link href="/admin" className="text-xs text-accent hover:underline font-bold uppercase">&larr; Admin Dashboard</Link>
-            </div>
-            <h1 className="text-3xl font-extrabold text-white mt-1">Member Directory</h1>
-            <p className="text-slate-400 text-sm">Search, filter, and inspect member subscription accounts.</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => alert('Exporting full members list...')}
-              className="px-4 py-2 bg-accent hover:bg-accent-light text-slate-950 font-bold rounded-xl text-xs transition-colors"
-            >
-              Export CSV
-            </button>
-          </div>
-        </div>
+        <AdminSubNav
+          title="Member Directory"
+          subtitle="Search, filter, inspect subscription tiers, and review gym floor attendance."
+        />
 
         {/* Filter Toolbar */}
         <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
