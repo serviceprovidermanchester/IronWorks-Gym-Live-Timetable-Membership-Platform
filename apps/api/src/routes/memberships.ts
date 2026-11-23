@@ -2,15 +2,16 @@
  * Membership Routes — /v1/memberships
  * IronWorks Gym · SPManchester Private Limited
  *
- * GET  /membership-plans        List all plans
+ * GET  /memberships/plans       List all plans
  * POST /memberships/checkout    Create Stripe Checkout session
+ * POST /memberships/mandate     Create GoCardless Direct Debit redirect flow
  * POST /memberships/cancel      Cancel membership
- * POST /memberships/pause       Pause membership
  */
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import prisma from '../lib/prisma';
 import { stripe } from '../lib/stripe';
+import { createDirectDebitRedirectFlow } from '../lib/gocardless';
 import { requireAuth } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import { MembershipTier } from '@prisma/client';
@@ -42,7 +43,11 @@ router.post('/checkout', requireAuth, async (req: Request, res: Response, next: 
     // Get or create Stripe customer
     let customerId = member.stripeCustomerId;
     if (!customerId) {
-      const customer = await stripe.customers.create({ email: member.email, name: `${member.firstName} ${member.lastName}`, metadata: { memberId: member.id } });
+      const customer = await stripe.customers.create({
+        email: member.email,
+        name: `${member.firstName} ${member.lastName}`,
+        metadata: { memberId: member.id },
+      });
       customerId = customer.id;
       await prisma.member.update({ where: { id: member.id }, data: { stripeCustomerId: customerId } });
     }
@@ -53,14 +58,41 @@ router.post('/checkout', requireAuth, async (req: Request, res: Response, next: 
       payment_method_types: ['card'],
       line_items: plan.stripePriceId
         ? [{ price: plan.stripePriceId, quantity: 1 }]
-        : [{ price_data: { currency: 'gbp', unit_amount: plan.priceGbpPence, recurring: { interval: 'month' }, product_data: { name: plan.name, description: plan.tagline } }, quantity: 1 }],
-      success_url: `${process.env.FRONTEND_URL}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/membership?cancelled=true`,
+        : [
+            {
+              price_data: {
+                currency: 'gbp',
+                unit_amount: plan.priceGbpPence,
+                recurring: { interval: 'month' },
+                product_data: { name: plan.name, description: plan.tagline },
+              },
+              quantity: 1,
+            },
+          ],
+      success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/membership?cancelled=true`,
       metadata: { memberId: member.id, tier },
       billing_address_collection: 'required',
     });
 
     res.json({ success: true, data: { url: session.url, sessionId: session.id } });
+  } catch (err) { next(err); }
+});
+
+// POST /memberships/mandate — GoCardless Direct Debit redirect flow
+router.post('/mandate', requireAuth, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const member = await prisma.member.findUnique({ where: { id: req.member!.id } });
+    if (!member) throw new AppError('Member not found', 404);
+
+    const redirectUrl = await createDirectDebitRedirectFlow({
+      memberId: member.id,
+      email: member.email,
+      name: `${member.firstName} ${member.lastName}`,
+      successRedirectUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard?gocardless=complete`,
+    });
+
+    res.json({ success: true, data: { redirectUrl } });
   } catch (err) { next(err); }
 });
 
@@ -80,8 +112,7 @@ router.post('/cancel', requireAuth, async (req: Request, res: Response, next: Ne
       data: { status: 'CANCELLED', cancelledAt: new Date() },
     });
 
-    // TODO: Send cancellation email
-    res.json({ success: true, message: 'Membership cancelled. Access continues until end of current period.' });
+    res.json({ success: true, message: 'Membership cancelled. Access continues until end of current billing period.' });
   } catch (err) { next(err); }
 });
 
