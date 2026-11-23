@@ -26,6 +26,11 @@
     "pnpm": ">=9.0.0"
   },
   "packageManager": "pnpm@9.14.2",
+  "pnpm": {
+    "overrides": {
+      "drizzle-kit": "0.23.2"
+    }
+  },
   "author": {
     "name": "Sayed Mudassar Akbar",
     "email": "info@spmanchester.com",
