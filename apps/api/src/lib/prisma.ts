@@ -11,6 +11,10 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 // Detect if running on Neon serverless connection pooler
 const isNeonPooler = (process.env.DATABASE_URL || '').includes('-pooler.');
 
+const dbUrl =
+  process.env.DATABASE_URL ||
+  'postgresql://ironworks:ironworks_dev_password@localhost:5432/ironworks_db';
+
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
@@ -20,7 +24,7 @@ export const prisma =
         : [{ emit: 'event', level: 'error' }],
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: dbUrl,
       },
     },
   });

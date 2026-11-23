@@ -2,7 +2,11 @@
  * IronWorks Gym API — Entry Point
  * SPManchester Private Limited · https://www.spmanchester.com
  */
-import 'dotenv/config';
+import path from 'path';
+import dotenv from 'dotenv';
+dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'apps/api/.env') });
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
