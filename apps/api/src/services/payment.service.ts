@@ -7,6 +7,7 @@ import { stripe } from '../lib/stripe';
 import { emailService } from '../lib/email';
 import { logger } from '../lib/logger';
 import { AppError } from '../middleware/errorHandler';
+import { MembershipTier } from '@prisma/client';
 
 export const paymentService = {
   /**
@@ -21,7 +22,7 @@ export const paymentService = {
     amountPence,
   }: {
     memberId: string;
-    tier: 'STANDARD' | 'UNLIMITED' | 'FOUNDING_MEMBER';
+    tier: any;
     provider: 'stripe' | 'gocardless';
     subscriptionId?: string;
     paymentIntentId?: string;
@@ -33,7 +34,7 @@ export const paymentService = {
       return;
     }
 
-    const plan = await prisma.membershipPlan.findUnique({ where: { tier } });
+    const plan = await prisma.membershipPlan.findFirst({ where: { tier: tier as any } });
 
     const now = new Date();
     const periodEnd = new Date(now);
@@ -43,7 +44,7 @@ export const paymentService = {
     const membership = await prisma.membership.upsert({
       where: { memberId },
       update: {
-        tier,
+        tier: tier as any,
         status: 'ACTIVE',
         stripeSubId: provider === 'stripe' ? subscriptionId : undefined,
         gcSubscriptionId: provider === 'gocardless' ? subscriptionId : undefined,
@@ -53,7 +54,7 @@ export const paymentService = {
       },
       create: {
         memberId,
-        tier,
+        tier: tier as any,
         status: 'ACTIVE',
         priceGbpPence: amountPence,
         stripeSubId: provider === 'stripe' ? subscriptionId : undefined,
@@ -118,7 +119,7 @@ export const paymentService = {
 
     await prisma.membership.update({
       where: { id: membership.id },
-      data: { status: 'PAST_DUE' },
+      data: { status: 'PENDING_PAYMENT' },
     });
 
     // Record failed payment in ledger

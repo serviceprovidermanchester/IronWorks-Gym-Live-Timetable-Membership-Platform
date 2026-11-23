@@ -82,7 +82,7 @@ router.post('/', async (req: Request, res: Response, next: NextFunction) => {
 router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const booking = await prisma.booking.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: { classSession: { include: { coach: true } } },
     });
 
@@ -100,7 +100,7 @@ router.delete('/:id', async (req: Request, res: Response, next: NextFunction) =>
   try {
     const isAdmin = req.member!.role === 'ADMIN';
     await bookingService.cancelBooking({
-      bookingId: req.params.id,
+      bookingId: req.params.id as string,
       memberId: req.member!.id,
       isAdmin,
     });

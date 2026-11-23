@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen bg-brand-dark pt-8 pb-20 text-ink">
+    <div className="min-h-screen bg-slate-950 pt-8 pb-20 text-slate-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Navigation sub-bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-8">

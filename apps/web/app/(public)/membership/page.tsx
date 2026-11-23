@@ -1,72 +1,130 @@
 /**
  * Membership page — IronWorks Gym
- * SPManchester Private Limited
+ * SPManchester Private Limited · https://www.spmanchester.com
  */
 import { Metadata } from 'next';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
 import { PlanCard } from '@/components/membership/PlanCard';
 
 export const metadata: Metadata = {
-  title: 'Membership Plans',
-  description: 'Join IronWorks Gym from £29/mo. No joining fee, no contract. Month-to-month.',
+  title: 'Membership Plans | IronWorks Gym Manchester',
+  description: 'Join IronWorks Gym from £29/mo. No joining fee, no lock-in contracts. Month-to-month freedom.',
 };
 
 const STATIC_PLANS = [
-  { name: 'Off-Peak', slug: 'off-peak', tagline: 'Train on your terms. 09:00–16:00 + all weekend.', priceGbpPence: 2900, isPopular: false, features: [{ text: 'Full gym access (09:00–16:00 weekdays)', included: true }, { text: 'Full weekend access (all hours)', included: true }, { text: 'All off-peak classes included', included: true }, { text: 'Locker & changing facilities', included: true }, { text: 'Peak-hour access', included: false }] },
-  { name: 'All Access', slug: 'all-access', tagline: 'No restrictions. Unlimited classes, any time.', priceGbpPence: 4200, isPopular: true, features: [{ text: 'Unlimited gym access (05:30–23:00)', included: true }, { text: 'Unlimited classes (all categories)', included: true }, { text: 'Guest pass (1/month)', included: true }, { text: 'Class booking (live build)', included: true }, { text: 'PT or coaching sessions', included: false }] },
-  { name: 'All Access + Coaching', slug: 'all-access-plus', tagline: 'Everything in All Access + personal coaching.', priceGbpPence: 7900, isPopular: false, features: [{ text: 'Everything in All Access', included: true }, { text: 'Monthly 1-to-1 coaching (60 min)', included: true }, { text: 'Personal 12-week programme', included: true }, { text: 'Progress tracking & check-ins', included: true }, { text: 'Guest pass (2/month)', included: true }] },
+  {
+    name: 'Standard Tier',
+    slug: 'standard-tier',
+    tier: 'STANDARD',
+    tagline: 'Train on your terms. Full open gym floor + 4 classes per month.',
+    priceGbpPence: 4900,
+    priceMonthly: 49,
+    isPopular: false,
+    isFeatured: false,
+    features: [
+      { text: 'Full open gym floor access (05:30–23:00)', included: true },
+      { text: '4 coach-led classes every month', included: true },
+      { text: 'Locker & luxury changing facilities', included: true },
+      { text: 'Free IronWorks training app', included: true },
+      { text: 'Unlimited weekly class bookings', included: false },
+    ],
+  },
+  {
+    name: 'Unlimited Tier',
+    slug: 'unlimited-tier',
+    tier: 'UNLIMITED',
+    tagline: 'Our flagship membership. All 18 weekly classes unmetered.',
+    priceGbpPence: 7500,
+    priceMonthly: 75,
+    isPopular: true,
+    isFeatured: true,
+    features: [
+      { text: 'Unlimited open gym access (05:30–23:00)', included: true },
+      { text: 'All 18 weekly classes unmetered', included: true },
+      { text: '7-day advance class booking window', included: true },
+      { text: '1 free guest pass every month', included: true },
+      { text: '15% discount on 1-to-1 personal training', included: true },
+    ],
+  },
+  {
+    name: 'Founding Member',
+    slug: 'founding-member',
+    tier: 'FOUNDING_MEMBER',
+    tagline: 'VIP athletic tier with monthly 1-on-1 coaching & programming.',
+    priceGbpPence: 9900,
+    priceMonthly: 99,
+    isPopular: false,
+    isFeatured: false,
+    features: [
+      { text: 'Everything in Unlimited Tier', included: true },
+      { text: 'Monthly 60-min 1-on-1 coaching session', included: true },
+      { text: 'Custom 12-week lifting & nutrition programme', included: true },
+      { text: 'Guaranteed spot in peak classes', included: true },
+      { text: 'Exclusive IronWorks competition apparel pack', included: true },
+    ],
+  },
 ];
 
 const FAQS = [
-  { q: 'Is there a joining fee?', a: 'No joining fee ever. Pay your first month and you\'re in.' },
-  { q: 'Can I cancel any time?', a: 'Yes — month-to-month only. Cancel before the next billing date.' },
-  { q: 'What\'s the cooling-off period?', a: '14 days under the Consumer Contracts Regulations for online sign-ups.' },
-  { q: 'Can I pause my membership?', a: 'Yes, up to 3 months per year. Manage it from your member dashboard.' },
-  { q: 'Which payment methods do you accept?', a: 'Card (Stripe) and UK Direct Debit (GoCardless) — your choice.' },
+  { q: 'Is there a joining fee or setup charge?', a: 'No joining fee ever. Pay your first month and you are ready to train on day one.' },
+  { q: 'Can I cancel any time?', a: 'Yes — month-to-month only. Cancel before your next billing date with zero penalty or exit fees.' },
+  { q: 'What is the cooling-off period?', a: '14 days statutory cooling-off under Consumer Contracts Regulations for online sign-ups.' },
+  { q: 'Can I pause my membership if I travel or get injured?', a: 'Yes, pause for up to 3 months per year with 1 click from your member dashboard.' },
+  { q: 'Which payment methods do you accept?', a: 'Major credit/debit cards via Stripe and UK Direct Debit via GoCardless.' },
 ];
 
 export default function MembershipPage() {
   return (
-    <>
-      <Header />
-      <main>
-        {/* Hero */}
-        <section className="bg-gradient-to-br from-brand to-brand-dark text-white py-20 text-center px-5">
-          <span className="inline-block bg-white/20 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">Membership</span>
-          <h1 className="text-4xl md:text-5xl font-black mb-4">No contract traps</h1>
-          <p className="text-lg opacity-90 max-w-xl mx-auto">Month-to-month. Cancel any time. The pricing page a chain would be proud of, for a gym with a soul.</p>
-        </section>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      {/* Hero */}
+      <section className="relative bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white py-20 md:py-28 text-center px-5 border-b border-slate-800 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-brand/15 blur-[120px] rounded-full pointer-events-none" />
+        <div className="relative max-w-4xl mx-auto">
+          <span className="inline-flex items-center gap-2 bg-brand/10 border border-brand/30 text-brand text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+            ★ Transparent Pricing · Ancoats, Manchester
+          </span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 tracking-tight">
+            No contract traps. <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand via-orange-400 to-amber-300">Total training freedom.</span>
+          </h1>
+          <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Month-to-month freedom. Cancel anytime online. The transparent pricing a chain would be proud of, for an independent gym with serious standards.
+          </p>
+        </div>
+      </section>
 
-        {/* Plans */}
-        <section className="py-20 px-5 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6 items-start">
-              {STATIC_PLANS.map((plan) => <PlanCard key={plan.slug} plan={plan} />)}
-            </div>
-            <p className="mt-8 text-sm text-muted text-center italic">* Prices are sample content. All plans are month-to-month. 14-day cooling-off period applies.</p>
+      {/* Plans */}
+      <section className="py-20 px-5 bg-slate-950">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
+            {STATIC_PLANS.map((plan) => (
+              <PlanCard key={plan.slug} plan={plan} />
+            ))}
           </div>
-        </section>
+          <p className="mt-10 text-xs sm:text-sm text-slate-500 text-center italic">
+            * All memberships are rolling 30-day subscriptions. 14-day cooling-off period applies. Bacs Direct Debit and card checkout available.
+          </p>
+        </div>
+      </section>
 
-        {/* FAQ */}
-        <section className="py-20 px-5 bg-white">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold mb-10 text-center">Common questions</h2>
-            <div className="flex flex-col gap-4">
-              {FAQS.map((faq) => (
-                <details key={faq.q} className="bg-gray-50 rounded-2xl p-6 group cursor-pointer">
-                  <summary className="font-bold list-none flex justify-between items-center">
-                    {faq.q}
-                    <span className="text-brand text-xl transition-transform group-open:rotate-45">+</span>
-                  </summary>
-                  <p className="mt-3 text-muted text-sm leading-relaxed">{faq.a}</p>
-                </details>
-              ))}
-            </div>
+      {/* FAQ */}
+      <section className="py-20 px-5 bg-slate-900/60 border-t border-slate-800">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="text-xs uppercase font-bold text-brand tracking-wider">Got Questions?</span>
+            <h2 className="text-3xl font-extrabold text-white mt-1">Frequently Asked Questions</h2>
           </div>
-        </section>
-      </main>
-      <Footer />
-    </>
+          <div className="flex flex-col gap-4">
+            {FAQS.map((faq) => (
+              <details key={faq.q} className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 group cursor-pointer hover:border-slate-700 transition-colors">
+                <summary className="font-bold text-white text-base list-none flex justify-between items-center select-none">
+                  <span>{faq.q}</span>
+                  <span className="text-brand text-xl transition-transform group-open:rotate-45 font-mono">+</span>
+                </summary>
+                <p className="mt-3 text-slate-300 text-sm leading-relaxed border-t border-slate-800/80 pt-3">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

@@ -10,7 +10,7 @@ export function DemoBanner() {
   const [visible, setVisible] = useState(true);
   if (!visible) return null;
   return (
-    <div className="bg-ink text-gray-300 text-center text-sm py-2 px-4 relative">
+    <div className="bg-slate-900 border-b border-slate-800 text-slate-300 text-center text-xs sm:text-sm py-2 px-4 relative">
       ★ <strong className="text-yellow-300">Concept / Demo Project</strong> — IronWorks Gym is a fictional business.
       {' '}Built by{' '}
       <a href="https://www.spmanchester.com" className="text-yellow-300 font-semibold hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">

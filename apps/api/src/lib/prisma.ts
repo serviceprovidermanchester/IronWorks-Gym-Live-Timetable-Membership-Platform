@@ -29,7 +29,7 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
-prisma.$on('error', (e) => {
+(prisma as any).$on?.('error', (e: any) => {
   logger.error({ err: e }, 'Prisma database error');
 });
 

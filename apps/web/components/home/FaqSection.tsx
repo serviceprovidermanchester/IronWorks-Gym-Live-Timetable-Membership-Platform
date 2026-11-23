@@ -29,7 +29,7 @@ export function FaqSection() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <section className="py-20 bg-brand-dark border-t border-slate-800/80">
+    <section className="py-20 bg-slate-950 border-t border-slate-800/80">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <span className="text-xs uppercase font-bold text-accent tracking-wider">Frequently Asked Questions</span>

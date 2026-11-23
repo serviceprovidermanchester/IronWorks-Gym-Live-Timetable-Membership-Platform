@@ -9,19 +9,23 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#e4572e',
-          dark: '#a8320f',
-          light: '#f9e8e3',
+          DEFAULT: '#ff5500',
+          dark: '#090d16',
+          surface: '#0f172a',
+          light: '#fff5f0',
         },
         accent: {
-          DEFAULT: '#2a9d8f',
-          dark: '#1e7268',
+          DEFAULT: '#ff5500',
+          light: '#ff7733',
+          dark: '#e04400',
+          teal: '#14b8a6',
         },
         ink: {
-          DEFAULT: '#14202b',
-          soft: '#2c3e50',
+          DEFAULT: '#f8fafc',
+          muted: '#94a3b8',
+          dark: '#090d16',
         },
-        muted: '#5b6b7a',
+        muted: '#94a3b8',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],

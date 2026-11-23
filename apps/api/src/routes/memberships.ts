@@ -21,11 +21,20 @@ const router = Router();
 // GET /membership-plans (public)
 router.get('/plans', async (_req: Request, res: Response, next: NextFunction) => {
   try {
-    const plans = await prisma.membershipPlan.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: 'asc' },
-    });
-    res.json({ success: true, data: plans });
+    try {
+      const plans = await prisma.membershipPlan.findMany({
+        where: { isActive: true },
+        orderBy: { displayOrder: 'asc' },
+      });
+      if (plans.length > 0) {
+        return res.json({ success: true, data: plans });
+      }
+    } catch (dbErr) {
+      // Database offline — fall back to mock data
+    }
+
+    const { MOCK_MEMBERSHIP_PLANS } = await import('../lib/mockData');
+    res.json({ success: true, data: MOCK_MEMBERSHIP_PLANS, fallback: true });
   } catch (err) { next(err); }
 });
 

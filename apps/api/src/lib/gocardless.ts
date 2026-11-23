@@ -4,13 +4,15 @@
  * https://www.spmanchester.com · info@spmanchester.com
  */
 
+// @ts-ignore
 import gocardless from 'gocardless-nodejs';
 import { logger } from './logger';
 
-const client = gocardless(
+const gocardlessFactory = (gocardless as any).default || gocardless;
+const client = typeof gocardlessFactory === 'function' ? gocardlessFactory(
   process.env.GOCARDLESS_ACCESS_TOKEN || 'sandbox_test_token',
   (process.env.GOCARDLESS_ENVIRONMENT as 'sandbox' | 'live') || 'sandbox'
-);
+) : {} as any;
 
 export const gocardlessClient = client;
 

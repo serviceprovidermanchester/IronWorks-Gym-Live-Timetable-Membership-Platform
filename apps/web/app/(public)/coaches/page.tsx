@@ -51,7 +51,7 @@ const coaches = [
 
 export default function CoachesPage() {
   return (
-    <div className="min-h-screen bg-brand-dark pt-12 pb-24 text-ink">
+    <div className="min-h-screen bg-slate-950 pt-12 pb-24 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-accent text-sm font-semibold tracking-wider uppercase">Expert Instruction</span>
@@ -75,7 +75,7 @@ export default function CoachesPage() {
                   alt={coach.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute top-3 left-3 bg-brand-dark/90 backdrop-blur-md px-2.5 py-1 rounded text-xs font-bold text-accent border border-slate-700">
+                <div className="absolute top-3 left-3 bg-slate-950/90 backdrop-blur-md px-2.5 py-1 rounded text-xs font-bold text-accent border border-slate-700">
                   {coach.experience}
                 </div>
               </div>

@@ -66,7 +66,7 @@ export const bookingService = {
     if (confirmedCount < session.capacity) {
       const booking = await prisma.booking.create({
         data: {
-          bookingRef,
+          notes: bookingRef,
           memberId,
           classSessionId,
           classDate,
@@ -99,7 +99,7 @@ export const bookingService = {
 
     const booking = await prisma.booking.create({
       data: {
-        bookingRef,
+        notes: bookingRef,
         memberId,
         classSessionId,
         classDate,

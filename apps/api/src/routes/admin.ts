@@ -60,7 +60,7 @@ router.get('/bookings', async (req: Request, res: Response, next: NextFunction) 
 // POST /admin/bookings/:id/check-in
 router.post('/bookings/:id/check-in', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const booking = await prisma.booking.update({ where: { id: req.params.id }, data: { status: 'ATTENDED', attendedAt: new Date() } });
+    const booking = await prisma.booking.update({ where: { id: req.params.id as string }, data: { status: 'ATTENDED', attendedAt: new Date() } });
     res.json({ success: true, data: booking, message: 'Member checked in' });
   } catch (err) { next(err); }
 });

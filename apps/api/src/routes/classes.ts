@@ -13,12 +13,13 @@ import prisma from '../lib/prisma';
 import { cache } from '../lib/redis';
 import { optionalAuth } from '../middleware/auth';
 import { ClassCategory, DayOfWeek } from '@prisma/client';
+import { MOCK_CLASSES } from '../lib/mockData';
 
 const router = Router();
 
 const ListSchema = z.object({
-  day: z.nativeEnum(DayOfWeek).optional(),
-  category: z.nativeEnum(ClassCategory).optional(),
+  day: z.string().optional(),
+  category: z.string().optional(),
   active: z.coerce.boolean().optional().default(true),
 });
 
@@ -27,21 +28,42 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { day, category, active } = ListSchema.parse(req.query);
     const cacheKey = `classes:${day ?? 'ALL'}:${category ?? 'ALL'}:${active}`;
-    const cached = await cache.get(cacheKey);
-    if (cached) return res.json({ success: true, data: cached, cached: true });
+    try {
+      const cached = await cache.get(cacheKey);
+      if (cached) return res.json({ success: true, data: cached, cached: true });
+    } catch {
+      // Redis offline, proceed to DB/mock
+    }
 
-    const classes = await prisma.classSession.findMany({
-      where: {
-        isActive: active,
-        ...(day && { dayOfWeek: day }),
-        ...(category && { category }),
-      },
-      include: { coach: { select: { id: true, name: true, slug: true, role: true, avatarUrl: true } } },
-      orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
-    });
+    try {
+      const classes = await prisma.classSession.findMany({
+        where: {
+          isActive: active,
+          ...(day && day !== 'All' && day !== 'ALL' && { dayOfWeek: day as any }),
+          ...(category && category !== 'All' && category !== 'ALL' && { category: category as any }),
+        },
+        include: { coach: { select: { id: true, name: true, slug: true, role: true, avatarUrl: true } } },
+        orderBy: [{ dayOfWeek: 'asc' }, { startTime: 'asc' }],
+      });
 
-    await cache.set(cacheKey, classes, 60); // Cache 1 min
-    res.json({ success: true, data: classes, count: classes.length });
+      if (classes.length > 0) {
+        try { await cache.set(cacheKey, classes, 60); } catch {}
+        return res.json({ success: true, data: classes, count: classes.length });
+      }
+    } catch (dbErr) {
+      // Database offline — fall back to mock data
+    }
+
+    // Filter mock classes
+    let filtered = MOCK_CLASSES;
+    if (day && day !== 'All' && day !== 'ALL') {
+      filtered = filtered.filter((c) => c.dayOfWeek.toUpperCase() === day.toUpperCase());
+    }
+    if (category && category !== 'All' && category !== 'ALL') {
+      filtered = filtered.filter((c) => c.category.toUpperCase() === category.toUpperCase());
+    }
+
+    res.json({ success: true, data: filtered, count: filtered.length, fallback: true });
   } catch (err) { next(err); }
 });
 
@@ -54,7 +76,7 @@ router.get('/categories', (_req: Request, res: Response) => {
 router.get('/:id', optionalAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const cls = await prisma.classSession.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
         coach: true,
         _count: { select: { bookings: true } },
@@ -68,7 +90,7 @@ router.get('/:id', optionalAuth, async (req: Request, res: Response, next: NextF
 // GET /classes/:id/schedule  — returns next 7 occurrences with booking count
 router.get('/:id/schedule', optionalAuth, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const cls = await prisma.classSession.findUnique({ where: { id: req.params.id } });
+    const cls = await prisma.classSession.findUnique({ where: { id: req.params.id as string } });
     if (!cls) return res.status(404).json({ success: false, error: 'Class not found', code: 'NOT_FOUND' });
 
     // Build next 7 days of this class

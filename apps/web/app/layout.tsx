@@ -49,7 +49,7 @@ export default function RootLayout({
       <head>
         <GymJsonLd />
       </head>
-      <body className="min-h-screen flex flex-col bg-brand-dark text-ink antialiased">
+      <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-brand selection:text-white">
         <QueryProvider>
           <AuthProvider>
             <DemoBanner />

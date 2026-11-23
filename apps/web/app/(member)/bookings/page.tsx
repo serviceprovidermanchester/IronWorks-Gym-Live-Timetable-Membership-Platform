@@ -77,7 +77,7 @@ export default function BookingsPage() {
   const displayed = activeTab === 'UPCOMING' ? upcoming : history;
 
   return (
-    <div className="min-h-screen bg-brand-dark pt-10 pb-20 text-ink">
+    <div className="min-h-screen bg-slate-950 pt-10 pb-20 text-slate-100">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>

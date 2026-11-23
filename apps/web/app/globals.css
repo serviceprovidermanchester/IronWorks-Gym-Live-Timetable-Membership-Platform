@@ -3,24 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --brand: #e4572e;
-  --brand-dark: #a8320f;
-  --brand-light: #f9e8e3;
-  --accent: #2a9d8f;
-  --ink: #14202b;
-  --muted: #5b6b7a;
+  --brand: #ff5500;
+  --brand-dark: #090d16;
+  --brand-light: #fff5f0;
+  --accent: #ff5500;
+  --ink: #f8fafc;
+  --muted: #94a3b8;
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 72px;
+  background-color: #090d16;
+  color: #f8fafc;
+}
 
 @layer base {
   * { box-sizing: border-box; }
-  a { color: var(--brand); }
-  :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 4px; }
+  body {
+    background-color: #090d16;
+    color: #f8fafc;
+    min-height: 100vh;
+  }
+  a {
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid #ff5500;
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
 }
 
 @layer utilities {
-  .text-brand { color: var(--brand); }
-  .bg-brand { background-color: var(--brand); }
-  .border-brand { border-color: var(--brand); }
+  .text-brand { color: #ff5500; }
+  .bg-brand { background-color: #ff5500; }
+  .border-brand { border-color: #ff5500; }
 }

@@ -28,8 +28,15 @@ const fallbackPlans = [
     name: 'Standard Tier',
     tier: 'STANDARD',
     priceMonthly: 49,
-    description: 'Full open gym access and 4 coach-led classes per month.',
-    features: ['Unlimited open gym floor access', '4 monthly classes included', 'Locker & shower facilities', 'Free IronWorks training app'],
+    priceGbpPence: 4900,
+    description: 'Full open gym floor access and 4 coach-led classes per month.',
+    features: [
+      { text: 'Full open gym floor access (05:30–23:00)', included: true },
+      { text: '4 coach-led classes every month', included: true },
+      { text: 'Locker & luxury shower facilities', included: true },
+      { text: 'Free IronWorks training mobile app', included: true },
+      { text: 'Unlimited weekly class bookings', included: false },
+    ],
     isFeatured: false,
   },
   {
@@ -37,8 +44,15 @@ const fallbackPlans = [
     name: 'Unlimited Tier',
     tier: 'UNLIMITED',
     priceMonthly: 75,
+    priceGbpPence: 7500,
     description: 'Our most popular membership. All 18 weekly classes unmetered.',
-    features: ['Unlimited open gym access', 'Unlimited coach-led classes', '7-day advance booking window', '15% off PT & nutrition coaching', 'Free guest pass every month'],
+    features: [
+      { text: 'Unlimited gym floor access (05:30–23:00)', included: true },
+      { text: 'All 18 weekly classes unmetered', included: true },
+      { text: '7-day advance class booking window', included: true },
+      { text: '1 free guest pass every month', included: true },
+      { text: '15% discount on 1-on-1 personal training', included: true },
+    ],
     isFeatured: true,
   },
   {
@@ -46,8 +60,15 @@ const fallbackPlans = [
     name: 'Founding Member',
     tier: 'FOUNDING_MEMBER',
     priceMonthly: 99,
+    priceGbpPence: 9900,
     description: 'All-inclusive VIP athletic tier with dedicated 1-on-1 coach check-ins.',
-    features: ['Everything in Unlimited', 'Monthly 1-on-1 PT technique check-in', 'Custom programming & nutrition review', 'IronWorks competition apparel pack', 'Guaranteed spot in peak classes'],
+    features: [
+      { text: 'Everything in Unlimited Tier', included: true },
+      { text: 'Monthly 60-min 1-on-1 coaching session', included: true },
+      { text: 'Custom 12-week lifting & nutrition programme', included: true },
+      { text: 'Guaranteed spot in peak classes', included: true },
+      { text: 'Exclusive IronWorks competition apparel pack', included: true },
+    ],
     isFeatured: false,
   },
 ];
@@ -104,10 +125,10 @@ export default async function HomePage() {
       </Suspense>
 
       {/* Membership Plans Section */}
-      <section id="plans" className="py-20 bg-brand-dark border-t border-slate-800">
+      <section id="plans" className="py-20 bg-slate-950 border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs uppercase font-bold text-accent tracking-wider">Transparent Pricing</span>
+            <span className="text-xs uppercase font-bold text-brand tracking-wider">Transparent Pricing</span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1">
               Membership — No Contract Traps
             </h2>
@@ -131,7 +152,7 @@ export default async function HomePage() {
       <FaqSection />
 
       {/* Final Call to Action */}
-      <section className="py-20 bg-gradient-to-b from-brand-dark to-slate-950 border-t border-slate-800 text-center">
+      <section className="py-20 bg-gradient-to-b from-slate-900 to-slate-950 border-t border-slate-800 text-center">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl md:text-4xl font-extrabold text-white">
             Ready to Experience Serious Training?
