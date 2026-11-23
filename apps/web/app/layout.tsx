@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { DemoBanner } from '@/components/layout/DemoBanner';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { GymJsonLd } from '@/components/seo/JsonLd';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -18,8 +19,14 @@ export const metadata: Metadata = {
     'fitness classes Manchester',
     'IronWorks gym',
     'SPManchester',
+    'powerlifting gym Manchester',
+    'HIIT classes Ancoats',
   ],
-  authors: [{ name: 'SPManchester Private Limited', url: 'https://spmanchester.com' }],
+  authors: [{ name: 'SPManchester Private Limited', url: 'https://www.spmanchester.com' }],
+  metadataBase: new URL('https://ironworksgym.co.uk'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     title: 'IronWorks Gym — Manchester Strength & Conditioning',
     description: '18 weekly coach-led classes, transparent pricing, 2-minute online joining.',
@@ -37,6 +44,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <GymJsonLd />
+      </head>
       <body className="min-h-screen flex flex-col bg-brand-dark text-ink antialiased">
         <AuthProvider>
           <DemoBanner />

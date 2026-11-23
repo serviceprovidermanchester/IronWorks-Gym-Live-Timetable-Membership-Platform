@@ -3,14 +3,13 @@
  * SPManchester Private Limited · https://www.spmanchester.com
  */
 import { Suspense } from 'react';
-import { DemoBanner } from '@/components/layout/DemoBanner';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import Link from 'next/link';
 import { HeroSection } from '@/components/layout/HeroSection';
 import { TimetableSection } from '@/components/timetable/TimetableSection';
 import { PlanCard } from '@/components/membership/PlanCard';
+import { ReviewsSection } from '@/components/home/ReviewsSection';
+import { FaqSection } from '@/components/home/FaqSection';
 
-// Fetch plans server-side for SSG
 async function getPlans() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/v1';
   try {
@@ -23,109 +22,139 @@ async function getPlans() {
   }
 }
 
+const fallbackPlans = [
+  {
+    id: 'plan_standard',
+    name: 'Standard Tier',
+    tier: 'STANDARD',
+    priceMonthly: 49,
+    description: 'Full open gym access and 4 coach-led classes per month.',
+    features: ['Unlimited open gym floor access', '4 monthly classes included', 'Locker & shower facilities', 'Free IronWorks training app'],
+    isFeatured: false,
+  },
+  {
+    id: 'plan_unlimited',
+    name: 'Unlimited Tier',
+    tier: 'UNLIMITED',
+    priceMonthly: 75,
+    description: 'Our most popular membership. All 18 weekly classes unmetered.',
+    features: ['Unlimited open gym access', 'Unlimited coach-led classes', '7-day advance booking window', '15% off PT & nutrition coaching', 'Free guest pass every month'],
+    isFeatured: true,
+  },
+  {
+    id: 'plan_founding',
+    name: 'Founding Member',
+    tier: 'FOUNDING_MEMBER',
+    priceMonthly: 99,
+    description: 'All-inclusive VIP athletic tier with dedicated 1-on-1 coach check-ins.',
+    features: ['Everything in Unlimited', 'Monthly 1-on-1 PT technique check-in', 'Custom programming & nutrition review', 'IronWorks competition apparel pack', 'Guaranteed spot in peak classes'],
+    isFeatured: false,
+  },
+];
+
 export default async function HomePage() {
   const plans = await getPlans();
+  const displayPlans = plans.length > 0 ? plans : fallbackPlans;
 
   return (
     <>
-      <DemoBanner />
-      <Header />
-      <main id="main-content">
-        {/* ── Hero ─────────────────────────────────────────── */}
-        <HeroSection />
+      {/* Hero Section */}
+      <HeroSection />
 
-        {/* ── Problem → Solution ───────────────────────────── */}
-        <section id="story" className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-5">
-            <h2 className="text-3xl font-bold mb-3">The problem → the solution</h2>
-            <p className="text-muted text-lg mb-10 max-w-2xl">
-              Every SPManchester concept project starts from a real market problem —
-              the same story we pitch to a client in this sector.
+      {/* The Problem → Solution pitch */}
+      <section id="story" className="py-20 bg-slate-900/60 border-y border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs uppercase font-bold text-accent tracking-wider">Concept Demo #01</span>
+            <h2 className="text-3xl font-extrabold text-white mt-1">The Problem → The Solution</h2>
+            <p className="text-slate-400 text-sm mt-2">
+              Every SPManchester concept project solves a concrete commercial problem in the sector.
             </p>
-            <div className="grid md:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
-              <div className="bg-white rounded-2xl shadow-md p-7 border-t-4 border-brand">
-                <h3 className="font-bold text-lg mb-3">❌ The problem</h3>
-                <p className="text-muted">
-                  Independent gyms run from a noticeboard: timetable screenshots on Instagram,
-                  pricing by DM, joining via paper form. Every friction point sends ready-to-join
-                  members to the budget chains.
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 items-stretch">
+            <div className="bg-slate-950 border border-rose-500/30 rounded-2xl p-8 flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">❌ The Market Problem</div>
+                <h3 className="text-xl font-bold text-white mb-3">Noticeboards & Instagram DMs</h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Independent gyms run from paper forms and timetable screenshot stories. When a prospective member has to message for pricing or visit a desk to sign up, they abandon and join a budget chain with an instant mobile app.
                 </p>
               </div>
-              <div className="flex items-center justify-center text-4xl font-black text-brand px-2 md:rotate-0 rotate-90">→</div>
-              <div className="bg-white rounded-2xl shadow-md p-7 border-t-4 border-accent">
-                <h3 className="font-bold text-lg mb-3">✅ The solution — this website</h3>
-                <p className="text-muted">
-                  A data-driven gym website with live class filters, honest membership tiers,
-                  and an online joining flow — indie character, chain-level convenience.
+              <div className="mt-6 text-xs text-rose-400/80 font-mono">High member drop-off · Lost revenue</div>
+            </div>
+
+            <div className="bg-slate-950 border border-emerald-500/30 rounded-2xl p-8 flex flex-col justify-between">
+              <div>
+                <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">✅ The Solution — IronWorks Platform</div>
+                <h3 className="text-xl font-bold text-white mb-3">Indie Character, Chain-Level Convenience</h3>
+                <p className="text-slate-300 text-sm leading-relaxed">
+                  Live data-driven timetable with 1-tap booking, transparent rolling monthly pricing, instant Stripe / GoCardless joining, and headless CMS control for gym coaches without touching code.
                 </p>
               </div>
+              <div className="mt-6 text-xs text-emerald-400/80 font-mono">2-minute joining flow · Zero contract friction</div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── Timetable ─────────────────────────────────────── */}
-        <Suspense fallback={<div className="py-20 text-center text-muted">Loading timetable…</div>}>
-          <TimetableSection />
-        </Suspense>
+      {/* Timetable Section */}
+      <Suspense fallback={<div className="py-20 text-center text-slate-400">Loading timetable…</div>}>
+        <TimetableSection />
+      </Suspense>
 
-        {/* ── Membership Plans ──────────────────────────────── */}
-        <section id="plans" className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-5">
-            <h2 className="text-3xl font-bold mb-3">Membership — no contract traps</h2>
-            <p className="text-muted text-lg mb-10">Month-to-month. Cancel any time. Transparent pricing.</p>
-            <div className="grid md:grid-cols-3 gap-6">
-              {plans.length > 0
-                ? plans.map((plan: any) => <PlanCard key={plan.id} plan={plan} />)
-                : (
-                  // Static fallback if API is not running
-                  <>
-                    <PlanCard plan={{ name: 'Off-Peak', slug: 'off-peak', tagline: 'Train on your terms', priceGbpPence: 2900, isPopular: false, features: [{ text: 'Full gym access (09:00–16:00)', included: true }, { text: 'All off-peak classes', included: true }, { text: 'Peak-hour access', included: false }] }} />
-                    <PlanCard plan={{ name: 'All Access', slug: 'all-access', tagline: 'No restrictions. Any time.', priceGbpPence: 4200, isPopular: true, features: [{ text: 'Unlimited gym access', included: true }, { text: 'Unlimited classes', included: true }, { text: 'Guest pass (1/month)', included: true }] }} />
-                    <PlanCard plan={{ name: 'All Access + Coaching', slug: 'all-access-plus', tagline: 'Everything + personal coaching', priceGbpPence: 7900, isPopular: false, features: [{ text: 'Everything in All Access', included: true }, { text: 'Monthly 1-to-1 coaching', included: true }, { text: 'Personal programme', included: true }] }} />
-                  </>
-                )
-              }
-            </div>
-            <p className="mt-6 text-sm text-muted italic">* Prices are sample content. Month-to-month — cancel any time.</p>
+      {/* Membership Plans Section */}
+      <section id="plans" className="py-20 bg-brand-dark border-t border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-xs uppercase font-bold text-accent tracking-wider">Transparent Pricing</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mt-1">
+              Membership — No Contract Traps
+            </h2>
+            <p className="text-slate-400 text-sm md:text-base mt-2">
+              Month-to-month freedom. Cancel anytime online. No hidden administrative fees.
+            </p>
           </div>
-        </section>
 
-        {/* ── Coaches ───────────────────────────────────────── */}
-        <section id="coaches" className="py-20 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-5">
-            <h2 className="text-3xl font-bold mb-3">Meet the coaches</h2>
-            <p className="text-muted text-lg mb-10">Every class led by a specialist — not a generalist with a clipboard.</p>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { name: 'Coach Dee', role: 'Strength & Olympic Lifting', color: 'from-brand to-brand-dark', initial: 'D' },
-                { name: 'Coach Marco', role: 'HIIT & Conditioning', color: 'from-accent to-accent-dark', initial: 'M' },
-                { name: 'Coach Ana', role: 'Yoga & Mobility', color: 'from-purple-600 to-purple-900', initial: 'A' },
-                { name: 'Coach Jay', role: 'Boxing & Combat', color: 'from-orange-600 to-red-900', initial: 'J' },
-              ].map((coach) => (
-                <div key={coach.name} className="bg-white rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${coach.color} flex items-center justify-center text-white text-3xl font-black mx-auto mb-4`}>
-                    {coach.initial}
-                  </div>
-                  <h3 className="font-bold text-lg">{coach.name}</h3>
-                  <p className="text-brand font-semibold text-sm mt-1 mb-3">{coach.role}</p>
-                </div>
-              ))}
-            </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {displayPlans.map((plan: any) => (
+              <PlanCard key={plan.id} plan={plan} />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── CTA ───────────────────────────────────────────── */}
-        <section className="py-20 bg-gradient-to-br from-brand to-brand-dark text-white text-center">
-          <div className="max-w-2xl mx-auto px-5">
-            <h2 className="text-4xl font-black mb-4">Ready to start?</h2>
-            <p className="text-lg opacity-90 mb-8">Join tonight. Your first class is waiting.</p>
-            <a href="/membership" className="inline-block bg-white text-brand font-bold px-8 py-4 rounded-full text-lg hover:bg-brand-light transition-colors">
-              See membership plans →
-            </a>
+      {/* Social Proof & Reviews */}
+      <ReviewsSection />
+
+      {/* Frequently Asked Questions */}
+      <FaqSection />
+
+      {/* Final Call to Action */}
+      <section className="py-20 bg-gradient-to-b from-brand-dark to-slate-950 border-t border-slate-800 text-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-white">
+            Ready to Experience Serious Training?
+          </h2>
+          <p className="mt-3 text-slate-400 text-base">
+            Join online in under 2 minutes and book your first session today.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <Link
+              href="/register"
+              className="px-8 py-3.5 bg-accent hover:bg-accent-light text-slate-950 font-bold rounded-xl transition-all shadow-lg shadow-accent/15"
+            >
+              Get Started Now
+            </Link>
+            <Link
+              href="/timetable"
+              className="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 transition-all"
+            >
+              Browse Timetable
+            </Link>
           </div>
-        </section>
-      </main>
-      <Footer />
+        </div>
+      </section>
     </>
   );
 }

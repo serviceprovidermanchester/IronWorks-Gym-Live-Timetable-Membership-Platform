@@ -7,6 +7,7 @@ import { Classes } from './src/collections/Classes';
 import { Coaches } from './src/collections/Coaches';
 import { MembershipPlans } from './src/collections/MembershipPlans';
 import { Announcements } from './src/collections/Announcements';
+import { Media } from './src/collections/Media';
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
@@ -19,7 +20,7 @@ export default buildConfig({
     },
   },
   editor: lexicalEditor({}),
-  collections: [Users, Classes, Coaches, MembershipPlans, Announcements],
+  collections: [Users, Classes, Coaches, MembershipPlans, Announcements, Media],
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
   },
