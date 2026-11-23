@@ -13,19 +13,19 @@ export const globalRateLimiter = rateLimit({
   message: { success: false, error: 'Too many requests — slow down.', code: 'RATE_LIMITED' },
 });
 
-/** Auth routes: 10 req/min per IP */
+/** Auth routes: 10 req/min per IP (skipped in dev) */
 export const authRateLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 10,
+  max: process.env.NODE_ENV === 'production' ? 10 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'Too many auth attempts — try again in a minute.', code: 'AUTH_RATE_LIMITED' },
 });
 
-/** Register: 5 req/15min per IP */
+/** Register: 5 req/15min per IP (skipped in dev) */
 export const registerRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: process.env.NODE_ENV === 'production' ? 5 : 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: 'Too many registrations from this IP.', code: 'REGISTER_RATE_LIMITED' },

@@ -23,8 +23,15 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormValues>();
+
+  const fillDemo = (email: string, pass: string) => {
+    setValue('email', email, { shouldValidate: true });
+    setValue('password', pass, { shouldValidate: true });
+    setServerError(null);
+  };
 
   const onSubmit = async (data: LoginFormValues) => {
     // Validate with Zod
@@ -108,6 +115,32 @@ export function LoginForm() {
       >
         Sign In to Portal
       </Button>
+
+      {/* Demo Credentials Box */}
+      <div className="mt-5 bg-slate-950 border border-slate-800 rounded-2xl p-4 text-xs space-y-2.5">
+        <div className="flex items-center justify-between text-slate-400 font-bold uppercase tracking-wider text-[11px]">
+          <span>⚡ Demo Credentials</span>
+          <span className="text-brand">Click to Fill</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => fillDemo('member@ironworksgym.com', 'MemberPassword123!')}
+            className="p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left transition-colors text-slate-200"
+          >
+            <div className="font-bold text-white text-[11px]">Member Account</div>
+            <div className="text-[10px] text-slate-400 font-mono truncate">member@ironworksgym.com</div>
+          </button>
+          <button
+            type="button"
+            onClick={() => fillDemo('admin@ironworksgym.com', 'AdminPassword123!')}
+            className="p-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left transition-colors text-slate-200"
+          >
+            <div className="font-bold text-brand text-[11px]">Admin Account</div>
+            <div className="text-[10px] text-slate-400 font-mono truncate">admin@ironworksgym.com</div>
+          </button>
+        </div>
+      </div>
     </form>
   );
 }
