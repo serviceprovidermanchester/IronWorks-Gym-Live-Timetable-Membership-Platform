@@ -138,4 +138,46 @@ export const emailService = {
       logger.error({ error, email }, 'Failed to send waitlist promotion email');
     }
   },
+
+  async sendPaymentReceipt({
+    email,
+    name,
+    amount,
+    date,
+    invoiceId,
+  }: {
+    email: string;
+    name: string;
+    amount: string;
+    date: string;
+    invoiceId: string;
+  }) {
+    try {
+      if (process.env.NODE_ENV !== 'production' && !process.env.RESEND_API_KEY) {
+        logger.info({ email, amount, invoiceId }, '[DEV EMAIL] Payment receipt sent (mock)');
+        return { success: true, id: 'mock-receipt-id' };
+      }
+
+      return await resend.emails.send({
+        from: FROM_EMAIL,
+        to: email,
+        subject: `Payment Receipt: ${amount} — IronWorks Gym (${invoiceId})`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #f8fafc; padding: 32px; border-radius: 12px; border: 1px solid #334155;">
+            <h2 style="color: #f97316; margin-top: 0;">Payment Receipt</h2>
+            <p style="color: #cbd5e1;">Hi ${name}, thank you for your monthly membership payment.</p>
+            <div style="background: #1e293b; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Invoice #:</strong> <span style="font-family: monospace; color: #f97316;">${invoiceId}</span></p>
+              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Date:</strong> ${date}</p>
+              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Amount Paid:</strong> <span style="font-size: 18px; font-weight: bold; color: #10b981;">${amount}</span></p>
+              <p style="margin: 6px 0; color: #cbd5e1;"><strong>Status:</strong> Paid in full</p>
+            </div>
+            <p style="color: #94a3b8; font-size: 12px;">This is your official receipt for tax or company wellness reimbursement.</p>
+          </div>
+        `,
+      });
+    } catch (error) {
+      logger.error({ error, email }, 'Failed to send receipt email');
+    }
+  },
 };
