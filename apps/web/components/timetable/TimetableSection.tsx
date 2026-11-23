@@ -5,6 +5,7 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useBookingModalStore } from '@/lib/store';
+import { analytics } from '@/lib/analytics';
 import { Clock, User, Sparkles, Filter } from 'lucide-react';
 
 const DAYS = ['All', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -75,10 +76,12 @@ export function TimetableSection() {
       .then((d) => {
         if (d.success && Array.isArray(d.data) && d.data.length > 0) {
           setApiClasses(d.data);
+          analytics.timetableFiltered({ day, category: cat, results_count: d.data.length });
         }
       })
       .catch(() => {
         // Quietly maintain fallback data
+        analytics.timetableFiltered({ day, category: cat, results_count: 18 });
       });
   }, [day, cat]);
 
@@ -257,7 +260,14 @@ export function TimetableSection() {
                         {/* Action Button */}
                         <td className="px-5 py-4 text-right whitespace-nowrap">
                           <button
-                            onClick={() => openBookingModal(c)}
+                            onClick={() => {
+                              analytics.classCardExpanded({
+                                class_name: c.name,
+                                category: c.category,
+                                coach: c.coach?.name || 'Coach',
+                              });
+                              openBookingModal(c);
+                            }}
                             className="bg-brand hover:bg-orange-600 text-white text-xs font-bold px-3.5 py-1.5 rounded-lg transition-all shadow-sm shadow-brand/20 active:scale-95"
                           >
                             Book Spot

@@ -5,6 +5,7 @@
  */
 import Link from 'next/link';
 import { Check, X } from 'lucide-react';
+import { analytics } from '@/lib/analytics';
 
 type FeatureItem = string | { text: string; included?: boolean };
 
@@ -105,6 +106,12 @@ export function PlanCard({ plan }: { plan: PlanData }) {
       {/* Action CTA */}
       <Link
         href="/register"
+        onClick={() => {
+          analytics.checkoutStarted({
+            tier: plan.tier || plan.name,
+            payment_method: 'stripe',
+          });
+        }}
         className={`block text-center font-bold py-3.5 px-6 rounded-xl transition-all duration-200 no-underline text-base ${
           isHighlighted
             ? 'bg-brand hover:bg-orange-600 text-white shadow-lg shadow-brand/25'
