@@ -54,8 +54,7 @@ export function LoginForm() {
       if (result?.error) {
         setServerError('Invalid email or password. Please try again.');
       } else {
-        router.push('/dashboard');
-        router.refresh();
+        window.location.href = '/dashboard';
       }
     } catch {
       setServerError('An unexpected error occurred. Please try again.');
