@@ -30,3 +30,21 @@ export const registerRateLimiter = rateLimit({
   legacyHeaders: false,
   message: { success: false, error: 'Too many registrations from this IP.', code: 'REGISTER_RATE_LIMITED' },
 });
+
+/** Payments: 20 checkouts/15min per IP */
+export const paymentRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Payment rate limit exceeded. Please wait a moment.', code: 'PAYMENT_RATE_LIMITED' },
+});
+
+/** File Uploads: 15 uploads/15min per IP */
+export const uploadRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Too many file uploads from this IP.', code: 'UPLOAD_RATE_LIMITED' },
+});

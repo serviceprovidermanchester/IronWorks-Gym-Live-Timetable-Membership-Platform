@@ -1,8 +1,10 @@
 /**
- * IronWorks Gym — Shared TypeScript Types
+ * IronWorks Gym — Shared TypeScript Types & Validations
  * Copyright (c) 2026 SPManchester Private Limited (Sayed Mudassar Akbar)
  * https://www.spmanchester.com · info@spmanchester.com
  */
+
+export * from './validations';
 
 export type MembershipTier = 'STANDARD' | 'UNLIMITED' | 'FOUNDING_MEMBER';
 
@@ -53,6 +55,7 @@ export interface Member {
   lastName: string;
   phone?: string | null;
   isAdmin: boolean;
+  avatarUrl?: string | null;
   stripeCustomerId?: string | null;
   gocardlessCustomerId?: string | null;
   createdAt: string;

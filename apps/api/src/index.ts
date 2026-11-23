@@ -22,6 +22,7 @@ import membershipRoutes from './routes/memberships';
 import bookingRoutes from './routes/bookings';
 import adminRoutes from './routes/admin';
 import webhookRoutes from './routes/webhooks';
+import uploadRoutes from './routes/uploads';
 
 const app = express();
 const PORT = process.env.PORT ?? 4000;
@@ -85,6 +86,7 @@ app.use('/v1/memberships', membershipRoutes);
 app.use('/v1/bookings', bookingRoutes);
 app.use('/v1/admin', adminRoutes);
 app.use('/v1/webhooks', webhookRoutes);
+app.use('/v1/uploads', uploadRoutes);
 
 // ── 404 handler ───────────────────────────────────────────────
 app.use((_req, res) => {
