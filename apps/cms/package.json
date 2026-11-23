@@ -9,6 +9,7 @@
     "build": "payload build",
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
+    "seed": "tsx src/seed.ts",
     "db:generate": "payload generate:types",
     "db:migrate": "payload migrate",
     "clean": "rimraf dist"
@@ -24,6 +25,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
     "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
   "author": {

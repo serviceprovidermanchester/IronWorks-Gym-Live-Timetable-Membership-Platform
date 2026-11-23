@@ -1,10 +1,17 @@
 import { CollectionConfig } from 'payload/types';
+import { isPublic, isAdmin } from '../access/roles';
 
 export const MembershipPlans: CollectionConfig = {
   slug: 'membership-plans',
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'tier', 'priceMonthly', 'isFeatured', 'isActive'],
+  },
+  access: {
+    read: isPublic,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

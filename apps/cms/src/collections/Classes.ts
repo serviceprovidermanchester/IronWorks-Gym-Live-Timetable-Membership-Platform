@@ -1,10 +1,22 @@
 import { CollectionConfig } from 'payload/types';
+import { isPublic, isAdminOrEditor } from '../access/roles';
+import { revalidateTimetableAfterChange, revalidateTimetableAfterDelete } from '../hooks/revalidate';
 
 export const Classes: CollectionConfig = {
   slug: 'classes',
   admin: {
     useAsTitle: 'name',
     defaultColumns: ['name', 'category', 'dayOfWeek', 'startTime', 'capacity', 'isActive'],
+  },
+  access: {
+    read: isPublic,
+    create: isAdminOrEditor,
+    update: isAdminOrEditor,
+    delete: isAdminOrEditor,
+  },
+  hooks: {
+    afterChange: [revalidateTimetableAfterChange],
+    afterDelete: [revalidateTimetableAfterDelete],
   },
   fields: [
     {
