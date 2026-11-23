@@ -1,0 +1,7 @@
+{
+  "name": "@ironworks/config",
+  "version": "2.0.0",
+  "description": "Shared configurations for IronWorks Gym repository",
+  "private": true,
+  "main": "index.js"
+}

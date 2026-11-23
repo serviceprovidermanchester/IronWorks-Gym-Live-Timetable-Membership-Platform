@@ -1,0 +1,55 @@
+# ── Monorepo ──────────────────────────────────────────────────
+node_modules/
+.turbo/
+dist/
+build/
+out/
+.cache/
+
+# ── Next.js ───────────────────────────────────────────────────
+.next/
+out/
+next-env.d.ts
+
+# ── Environment variables ─────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# ── Prisma ────────────────────────────────────────────────────
+# (keep schema.prisma and migrations, but not generated client in git)
+
+# ── OS / Editor ───────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.suo
+*.swp
+*~
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ── Test coverage ─────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Deployment ────────────────────────────────────────────────
+.vercel/
+.netlify/
+.railway/
+
+# ── Payload CMS ───────────────────────────────────────────────
+apps/cms/media/
+
+# ── Misc ──────────────────────────────────────────────────────
+*.zip
+*.tar.gz
+*.bak

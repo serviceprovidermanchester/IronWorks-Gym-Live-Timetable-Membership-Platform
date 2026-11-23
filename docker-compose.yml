@@ -1,0 +1,59 @@
+version: "3.9"
+
+# IronWorks Gym — Local Development Services
+# SPManchester Private Limited · https://www.spmanchester.com
+#
+# Usage:
+#   docker compose up -d          # Start Postgres + Redis in background
+#   docker compose down           # Stop and remove containers
+#   docker compose down -v        # Stop and remove containers + volumes (wipes data)
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ironworks_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ironworks
+      POSTGRES_PASSWORD: ironworks_dev_password
+      POSTGRES_DB: ironworks_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ironworks -d ironworks_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ironworks_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ironworks_redis_dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "ironworks_redis_dev", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Uncomment to run Payload CMS locally alongside the API
+  # cms:
+  #   build:
+  #     context: ./apps/cms
+  #   ports:
+  #     - "3001:3001"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   env_file:
+  #     - ./apps/cms/.env
+
+volumes:
+  postgres_data:
+  redis_data:

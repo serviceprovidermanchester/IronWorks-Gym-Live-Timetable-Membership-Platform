@@ -1,0 +1,277 @@
+// IronWorks Gym · Prisma Schema
+// SPManchester Private Limited · https://www.spmanchester.com
+// PostgreSQL 16 · Prisma 5
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── ENUMS ────────────────────────────────────────────────────
+
+enum MembershipTier {
+  OFF_PEAK
+  ALL_ACCESS
+  ALL_ACCESS_PLUS
+}
+
+enum MembershipStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  PENDING_PAYMENT
+  TRIAL
+}
+
+enum ClassCategory {
+  STRENGTH
+  HIIT
+  CONDITIONING
+  MOBILITY
+  COMBAT
+}
+
+enum DayOfWeek {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  ATTENDED
+  NO_SHOW
+  WAITLISTED
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum UserRole {
+  MEMBER
+  ADMIN
+  STAFF
+}
+
+// ── MODELS ───────────────────────────────────────────────────
+
+model Member {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  phone            String?
+  avatarUrl        String?
+  dateOfBirth      DateTime?
+  emergencyContact String?
+  role             UserRole         @default(MEMBER)
+  isActive         Boolean          @default(true)
+
+  // Membership
+  membership       Membership?
+
+  // Payment provider IDs
+  stripeCustomerId String?          @unique
+  gcMandateId      String?          @unique
+  gcCustomerId     String?          @unique
+
+  // Relations
+  bookings         Booking[]
+  payments         Payment[]
+  sessions         Session[]
+
+  // Audit
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  lastLoginAt      DateTime?
+  emailVerifiedAt  DateTime?
+
+  @@map("members")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([memberId])
+  @@map("sessions")
+}
+
+model Membership {
+  id                 String           @id @default(cuid())
+  memberId           String           @unique
+  member             Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  tier               MembershipTier
+  status             MembershipStatus @default(PENDING_PAYMENT)
+  priceGbpPence      Int
+  billingCycleDay    Int              @default(1)
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelledAt        DateTime?
+  pausedUntil        DateTime?
+  stripeSubId        String?          @unique
+  stripePriceId      String?
+  gcSubscriptionId   String?          @unique
+  payments           Payment[]
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([status])
+  @@map("memberships")
+}
+
+model Coach {
+  id             String         @id @default(cuid())
+  name           String
+  slug           String         @unique
+  role           String
+  bio            String
+  avatarUrl      String?
+  certifications String[]
+  instagramUrl   String?
+  displayOrder   Int            @default(0)
+  isActive       Boolean        @default(true)
+  classes        ClassSession[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@map("coaches")
+}
+
+model ClassSession {
+  id           String        @id @default(cuid())
+  name         String
+  slug         String        @unique
+  description  String?
+  category     ClassCategory
+  dayOfWeek    DayOfWeek
+  startTime    String        // "06:30" HH:MM
+  durationMins Int           @default(60)
+  capacity     Int           @default(20)
+  coachId      String
+  coach        Coach         @relation(fields: [coachId], references: [id])
+  location     String?       @default("Main floor")
+  imageUrl     String?
+  tags         String[]      @default([])
+  isActive     Boolean       @default(true)
+  bookings     Booking[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([dayOfWeek])
+  @@index([category])
+  @@index([isActive])
+  @@map("class_sessions")
+}
+
+model Booking {
+  id               String        @id @default(cuid())
+  memberId         String
+  member           Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  classSessionId   String
+  classSession     ClassSession  @relation(fields: [classSessionId], references: [id])
+  classDate        DateTime
+  status           BookingStatus @default(CONFIRMED)
+  waitlistPosition Int?
+  cancelledAt      DateTime?
+  attendedAt       DateTime?
+  notes            String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@unique([memberId, classSessionId, classDate])
+  @@index([memberId])
+  @@index([classSessionId])
+  @@index([classDate])
+  @@index([status])
+  @@map("bookings")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  memberId          String
+  member            Member        @relation(fields: [memberId], references: [id])
+  membershipId      String?
+  membership        Membership?   @relation(fields: [membershipId], references: [id])
+  amountGbpPence    Int
+  currency          String        @default("gbp")
+  status            PaymentStatus @default(PENDING)
+  provider          String        // "stripe" | "gocardless"
+  providerPaymentId String?       @unique
+  description       String?
+  metadata          Json?
+  paidAt            DateTime?
+  failedAt          DateTime?
+  failureReason     String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([memberId])
+  @@index([status])
+  @@map("payments")
+}
+
+model MembershipPlan {
+  id            String         @id @default(cuid())
+  tier          MembershipTier @unique
+  name          String
+  slug          String         @unique
+  tagline       String
+  priceGbpPence Int
+  billingPeriod String         @default("monthly")
+  stripePriceId String?
+  features      Json           // [{text: string, included: boolean}]
+  isPopular     Boolean        @default(false)
+  isActive      Boolean        @default(true)
+  displayOrder  Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("membership_plans")
+}
+
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  body      String
+  type      String    @default("info")
+  isActive  Boolean   @default(true)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("announcements")
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String?
+  plan      String?
+  source    String?
+  createdAt DateTime @default(now())
+
+  @@map("waitlist_entries")
+}

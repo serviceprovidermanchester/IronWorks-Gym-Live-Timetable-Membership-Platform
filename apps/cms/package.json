@@ -1,0 +1,35 @@
+{
+  "name": "@ironworks/cms",
+  "version": "2.0.0",
+  "description": "Payload CMS for IronWorks Gym — Content & Timetable Management",
+  "private": true,
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "payload dev",
+    "build": "payload build",
+    "start": "node dist/server.js",
+    "type-check": "tsc --noEmit",
+    "db:generate": "payload generate:types",
+    "db:migrate": "payload migrate",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "payload": "^2.30.0",
+    "@payloadcms/db-postgres": "^1.4.0",
+    "@payloadcms/richtext-lexical": "^1.4.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  },
+  "author": {
+    "name": "Sayed Mudassar Akbar",
+    "email": "info@spmanchester.com",
+    "url": "https://www.spmanchester.com"
+  },
+  "license": "MIT"
+}

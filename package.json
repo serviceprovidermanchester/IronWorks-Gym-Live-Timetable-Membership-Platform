@@ -1,0 +1,39 @@
+{
+  "name": "ironworks-gym",
+  "version": "2.0.0",
+  "description": "IronWorks Gym — Full-Stack Live Timetable & Membership Platform. Built by SPManchester Private Limited.",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "db:generate": "turbo run db:generate",
+    "db:migrate": "turbo run db:migrate",
+    "db:seed": "turbo run db:seed",
+    "db:studio": "cd apps/api && npx prisma studio",
+    "clean": "turbo run clean && rimraf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.14.2",
+  "author": {
+    "name": "Sayed Mudassar Akbar",
+    "email": "info@spmanchester.com",
+    "url": "https://www.spmanchester.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serviceprovidermanchester/IronWorks-Gym-Live-Timetable-Membership-Platform.git"
+  }
+}

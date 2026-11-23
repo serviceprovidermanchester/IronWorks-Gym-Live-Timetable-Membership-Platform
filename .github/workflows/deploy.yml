@@ -1,0 +1,34 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-api:
+    name: Deploy Backend API (Railway / Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy API Notification
+        run: echo "Ready for Railway / Render backend deployment triggers."
+
+  deploy-cms:
+    name: Deploy Payload CMS (Railway / Docker)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy CMS Notification
+        run: echo "Ready for Payload CMS deployment triggers."
+
+  deploy-web:
+    name: Deploy Next.js Frontend (Vercel)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Web Notification
+        run: echo "Ready for Vercel deployment triggers."

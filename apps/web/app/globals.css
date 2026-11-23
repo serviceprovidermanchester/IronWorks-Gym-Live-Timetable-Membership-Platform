@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #e4572e;
+  --brand-dark: #a8320f;
+  --brand-light: #f9e8e3;
+  --accent: #2a9d8f;
+  --ink: #14202b;
+  --muted: #5b6b7a;
+}
+
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+
+@layer base {
+  * { box-sizing: border-box; }
+  a { color: var(--brand); }
+  :focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; border-radius: 4px; }
+}
+
+@layer utilities {
+  .text-brand { color: var(--brand); }
+  .bg-brand { background-color: var(--brand); }
+  .border-brand { border-color: var(--brand); }
+}
