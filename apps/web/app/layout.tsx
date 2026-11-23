@@ -5,7 +5,9 @@ import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { DemoBanner } from '@/components/layout/DemoBanner';
 import { AuthProvider } from '@/components/providers/AuthProvider';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import { GymJsonLd } from '@/components/seo/JsonLd';
+import { BookClassModal } from '@/components/timetable/BookClassModal';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -48,12 +50,15 @@ export default function RootLayout({
         <GymJsonLd />
       </head>
       <body className="min-h-screen flex flex-col bg-brand-dark text-ink antialiased">
-        <AuthProvider>
-          <DemoBanner />
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <DemoBanner />
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <BookClassModal />
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
