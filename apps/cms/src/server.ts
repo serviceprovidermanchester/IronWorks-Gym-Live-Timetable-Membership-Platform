@@ -345,8 +345,9 @@ app.get('/admin/members', (_req: Request, res: Response) => {
 app.get('/', (_req: Request, res: Response) => res.redirect('/admin'));
 app.use((_req: Request, res: Response) => res.status(404).redirect('/admin'));
 
-app.listen(PORT, () => {
-  console.log(`\n🏋️  IronWorks CMS Admin → http://localhost:${PORT}/admin`);
-  console.log(`📊  API endpoints  → http://localhost:${PORT}/api/`);
-  console.log(`✅  No database required\n`);
+const portNum = Number(PORT) || 3001;
+app.listen(portNum, '0.0.0.0', () => {
+  console.log(`\n🏋️  IronWorks CMS Admin → http://localhost:${portNum}/admin`);
+  console.log(`📊  API endpoints  → http://localhost:${portNum}/api/`);
+  console.log(`✅  No database required (Standalone Admin Engine)\n`);
 });
